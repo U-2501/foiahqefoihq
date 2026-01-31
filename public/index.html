@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>OffensiveMessages</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      background: #0b0b0b;
+      color: #00ff9c;
+      font-family: monospace;
+    }
+    #chat {
+      max-width: 500px;
+      margin: auto;
+      padding-top: 20px;
+    }
+    #messages {
+      height: 320px;
+      overflow-y: auto;
+      border: 1px solid #00ff9c;
+      padding: 10px;
+      background: #000;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      background: #000;
+      color: #00ff9c;
+      border: 1px solid #00ff9c;
+    }
+    button:hover {
+      background: #00ff9c;
+      color: #000;
+      cursor: pointer;
+    }
+    .msg {
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="chat">
+  <h2>💬 OffensiveMessages</h2>
+  <p style="font-size:12px;color:#aaa;">
+    offensive is my middle name
+  </p>
+
+  <input id="username" placeholder="Username" />
+  <div id="messages"></div>
+  <input id="message" placeholder="Type something reckless..." />
+  <button onclick="sendMessage()">Send</button>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+
+  const messagesDiv = document.getElementById("messages");
+
+  function sendMessage() {
+    const user = document.getElementById("username").value || "Anonymous";
+    const text = document.getElementById("message").value;
+    if (!text) return;
+
+    socket.emit("chatMessage", {
+      user,
+      text,
+      time: Date.now()
+    });
+
+    document.getElementById("message").value = "";
+  }
+
+  socket.on("chatMessage", (msg) => {
+    const div = document.createElement("div");
+    div.className = "msg";
+    div.textContent = `${msg.user}: ${msg.text}`;
+    messagesDiv.appendChild(div);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  });
+</script>
+
+</body>
+</html>
